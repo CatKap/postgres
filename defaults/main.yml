@@ -1,0 +1,4 @@
+# Variables defaults (easyly rewriten)
+postgres_user: 'dbuser'
+postgres_password: '12345'
+allow_net_conn: false

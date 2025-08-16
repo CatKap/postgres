@@ -1,0 +1,5 @@
+#Variables associated with the role
+packages:
+  - postgresql
+  - postgresql-contrib
+  - postgresql-server-dev-all
