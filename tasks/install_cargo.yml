@@ -1,0 +1,18 @@
+- name: Create a temporary file name
+  ansible.builtin.set_fact:
+    temp_file_path: "/var/ansible_{{ 9999999999999 | random }}.tmp"
+
+- name: Debug the temporary file path
+  debug:
+    var: temp_file_path 
+
+- name: Download cargo installation for pgrx
+  ansible.builtin.get_url:
+    url: "{{cargo_install_file_url}}"
+    mode: "744"
+    dest: "{{temp_file_path}}"
+  become: true
+
+- name: Set mode for file and start it
+  command: "{{temp_file_path}} -y"
+  become: true

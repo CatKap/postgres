@@ -1,0 +1,34 @@
+- name: Check cargo installation
+  command: "/root/.cargo/bin/cargo -V"
+  register: cargo_check
+  ignore_errors: true
+  become: true
+
+- name: Install cargo
+  ansible.builtin.include_tasks: install_cargo.yml 
+  when: cargo_check.rc != 0 # No cargo command found
+
+- name: Check packages installation in Debian
+  apt:
+    name: 
+      - libssl-dev  
+      - pkg-config
+    state: present
+  when: "ansible_facts['os_family'] == 'Debian'"
+  become: true
+
+
+
+- name: Check installation in RedHat
+  dnf:
+    name: 
+      - openssl-devel
+      - pkg-config
+    state: present
+  become: true
+
+- name: Install pgrx
+  command: /root/.cargo/bin/cargo install --locked cargo-pgrx
+  become: true
+
+ 

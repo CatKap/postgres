@@ -15,11 +15,22 @@
     with_items: "{{ packages }}"
   when: "ansible_facts['os_family'] == 'RedHat'"
   become: true
+
 - name: Enable postgresql in systemd
   systemd:
     name: postgresql.service
     enabled: true
 
-- name: Start Postgress 
+- name: Start Postgress
   ansible.builtin.shell: "pg_ctlcluster start $(pg_conftool --short show cluster_name | sed 's,/, ,')"
   become: true
+
+- name: Check if pgrx required
+  ansible.builtin.include_tasks: 'install_pgrx.yml'
+  when: "'pgrx' in modules"
+
+#- name: Install pr
+
+
+
+

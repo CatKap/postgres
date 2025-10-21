@@ -1,4 +1,8 @@
 # Variables defaults (easyly rewriten)
-postgres_user: 'dbuser'
-postgres_password: '12345'
+postgres_version: '18'
 allow_net_conn: false
+install_pgrx: false
+modules: []
+#cargo_install_file_url: 'https://rsproxy.cn/rustup-init.sh'
+cargo_install_file_url: 'https://sh.rustup.rs'
+
