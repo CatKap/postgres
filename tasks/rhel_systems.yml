@@ -1,0 +1,46 @@
+- name: Check installation in RedHat
+  dnf:
+    name: "{{ item }}"
+    state: present
+    with_items: "{{ packages }}"
+  become: true
+
+- name: Gather OS version facts
+  ansible.builtin.setup:
+    filter: ansible_distribution_major_version
+    gather_subset: '!all'
+
+- name: Set repository RPM URL
+  ansible.builtin.set_fact:
+    pg_repo_url: "https://download.postgresql.org/pub/repos/yum/reporpms/EL-{{ ansible_distribution_major_version }}-x86_64/pgdg-redhat-repo-latest.noarch.rpm"
+
+- name: Ensure old PostgreSQL repo packages are removed (if any)
+  ansible.builtin.yum:
+    name: pgdg-redhat-repo
+    state: absent
+  when: ansible_distribution_major_version|int < 9  # optional safeguard for very old distros   
+- name: Install PostgreSQL YUM repository
+ ansible.builtin.yum:
+   name: "{{ pg_repo_url }}"
+   state: present
+
+- name: Disable built-in PostgreSQL module (RHEL 8+)
+  ansible.builtin.command: dnf -qy module disable postgresql
+  args:
+    warn: false
+  when: ansible_distribution_major_version|int >= 8   
+  become:true
+    
+- name: Install PostgreSQL server and client packages
+  ansible.builtin.yum:
+    name:
+      - "postgresql{{ pg_version }}"
+      - "postgresql{{ pg_version }}-server"
+    state: present
+    enablerepo: "pgdg{{ pg_version }}"
+
+    
+
+    
+    
+    

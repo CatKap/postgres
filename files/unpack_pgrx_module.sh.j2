@@ -1,0 +1,31 @@
+#!/bin/bash
+if [[ $UID -ne 0 ]] then
+  echo "This script should be running as root"
+  exit -1
+fi
+
+if ! awk '$1 == {{pg_version}} $3 == "installed" && $2 == "{{item}}" {exit 0} END {exit 1}'; then
+  echo "Module already installed"
+  exit 0
+fi
+
+mkdir -p {{pgrx_modules_dir}}
+if ! wget -O /tmp/module.zip $1; then
+  echo "Cannot download achive"
+  exit -1
+fi
+
+if ! unzip /tmp/module.zip -d {{pgrx_modules_dir}}; then
+  echo "Error unzipping module"
+  exit -1
+fi
+
+MOD_DIR=$(ls -td {{pgrx_modules_dir}}*/ | head -n 1)
+
+cd $MOD_DIR
+
+cargo pgrx init --pg{{pg_version}} $(which pg_config)
+cargo pgrx install --release --features pg{{pg_version}}
+
+echo "{{pg_version}} {{item}} installed" >> /root/pgrx_modules/manifest 
+

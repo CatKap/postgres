@@ -1,3 +1,20 @@
-- name: Add postgres to sourses.list
-  command: echo "deb http://apt.postgresql.org/pub/repos/apt/ bionic-pgdg main" > /etc/apt/sources.list.d/pgdg.list
-  
+- name: Check packages installation in Debian
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items: "{{packages}}"
+  become: true
+
+- name: Install pgdg repo  
+  command: /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh -y
+  become: true
+
+- name: Update apt
+  command: apt update
+  become: true
+
+- name: Install postgesql
+  apt:
+    name: "postgresql-{{pg_version}}"
+    state: present
+  become: true

@@ -1,35 +1,36 @@
 #Tasks here
 #File can include smaller files if warranted
-- name: Check packages installation in Debian
-  apt:
-    name: "{{ item }}"
-    state: present
-  with_items: "{{packages}}"
-  when: "ansible_facts['os_family'] == 'Debian'"
-  become: true
 
-- name: Check installation in RedHat
-  dnf:
-    name: "{{ item }}"
-    state: present
-    with_items: "{{ packages }}"
+- name: Run RHEL-specific tasks 
+  include_tasks: rhel_systems.yml
   when: "ansible_facts['os_family'] == 'RedHat'"
-  become: true
+
+- name: Run Debian-specific tasks 
+  include_tasks: deb_systems.yml
+  when: "ansible_facts['os_family'] == 'Debian'"
 
 - name: Enable postgresql in systemd
   systemd:
     name: postgresql.service
     enabled: true
 
+- name: Check pg_ctlcluster 
+  command: "pg_ctlcluster --version"
+  register: pg_check
+  ignore_errors: true
+  become: true
+
+
 - name: Start Postgress
   ansible.builtin.shell: "pg_ctlcluster start $(pg_conftool --short show cluster_name | sed 's,/, ,')"
+  #ansible.builtin.shell: "pg_ctlcluster start {{pg_version}}"
   become: true
+  when: pg_check.rc != 0
 
 - name: Check if pgrx required
   ansible.builtin.include_tasks: 'install_pgrx.yml'
   when: "'pgrx' in modules"
 
-#- name: Install pr
 
 
 

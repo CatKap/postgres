@@ -1,5 +1,18 @@
 #Variables associated with the role
+
+# Pgrx modules setup vars
+pgrx_modules_dir: /root/pgrx_modules/
+
+
+# Check version compability 
+pg_version: "15"
+pgrx_verson: "0.16.0"
+
 packages:
-  - postgresql
+ # - postgresql
   - postgresql-contrib
   - postgresql-server-dev-all
+  - postgresql-common
+
+
+

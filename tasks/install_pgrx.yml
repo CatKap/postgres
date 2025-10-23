@@ -13,22 +13,39 @@
     name: 
       - libssl-dev  
       - pkg-config
+      - wget 
+      - unzip
     state: present
   when: "ansible_facts['os_family'] == 'Debian'"
   become: true
-
-
 
 - name: Check installation in RedHat
   dnf:
     name: 
       - openssl-devel
       - pkg-config
+      - git
     state: present
+  when: "ansible_facts['os_family'] == 'RedHat'"
   become: true
 
 - name: Install pgrx
-  command: /root/.cargo/bin/cargo install --locked cargo-pgrx
+  command: "/root/.cargo/bin/cargo install --locked cargo-pgrx@{{pgrx_version}}"
   become: true
 
- 
+- name: Copy installation script
+  template:
+    src: files/unpack_pgrx_module.sh.j2
+    dest: /root/unpgr.sh
+    mode: "744"
+    owner: "root"
+  become: true
+
+- name: Install pgrx modules 
+  command: "/root/unpgr.sh {{item}}"
+  loop: "{{ modules['pgrx'] }}"
+  become: true
+
+
+
+  
